@@ -1,5 +1,7 @@
 package flist;
 
+import java.util.function.Function;
+
 public abstract class FList<T> {
 	public final int size;
 	public abstract T head();
@@ -76,6 +78,13 @@ public abstract class FList<T> {
 			return ys;
 		}
 		return cons(xs.head(), concat(xs.tail(), ys));
+	}
+	
+	public static <E, F> FList<F> map(Function<E, F> fn, FList<E> xs){
+		if(xs.isEmpty()) {
+			return empty();
+		}
+		return cons(fn.apply(xs.head()), map(fn, xs.tail()));
 	}
 	
 	public static FList<Integer> build(int start, int finish){
