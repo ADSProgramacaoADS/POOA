@@ -9,6 +9,7 @@ public abstract class FList<T> {
 	public abstract boolean isEmpty();
 	public abstract boolean contains(T elmt);
 	public abstract FList<T> concat(FList<T> ys);
+	public abstract <U> FList<U> map(Function<T,U> fn);
 	
 	public FList(int size){
 		this.size = size;
@@ -30,6 +31,9 @@ public abstract class FList<T> {
 			}
 			public FList<E> concat(FList<E> ys){
 				return ys;
+			}
+			public <F> FList<F> map(Function <E, F> fn){
+				return empty();
 			}
 			public String toString() {
 				return "";
@@ -56,6 +60,9 @@ public abstract class FList<T> {
 			}
 			public FList<E> concat(FList<E> ys){
 				return cons(head, tail.concat(ys));
+			}
+			public <F> FList<F> map(Function <E, F> fn){
+				return cons(fn.apply(head), tail.map(fn));
 			}
 			public String toString() {
 				return head.toString() + " " + tail.toString();
