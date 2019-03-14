@@ -1,12 +1,18 @@
 package flist;
 
 public abstract class FList<T> {
+	public final int size;
 	public abstract T head();
 	public abstract FList<T> tail();
 	public abstract boolean isEmpty();
+	public abstract boolean contains(T elmt);
+	
+	public FList(int size){
+		this.size = size;
+	}
 	
 	public static <E> FList<E> empty(){
-		return new FList<E>(){
+		return new FList<E>(0){
 			public E head() {
 				throw new IllegalStateException();
 			}
@@ -16,11 +22,17 @@ public abstract class FList<T> {
 			public boolean isEmpty() {
 				return true;
 			}
+			public boolean contains(E elmt) {
+				return false;
+			}
+			public String toString() {
+				return "";
+			}
 		};
 	}
 	
 	public static <E> FList<E> cons(E head, FList<E> tail){
-		return new FList<E>() {
+		return new FList<E>(1 + tail.size) {
 			public E head() {
 				return head;
 			}
@@ -30,14 +42,33 @@ public abstract class FList<T> {
 			public boolean isEmpty() {
 				return false;
 			}
+			public boolean contains(E elmt) {
+				if(head.equals(elmt)) {
+					return true;
+				}
+				return tail.contains(elmt);
+			}
+			public String toString() {
+				return head.toString() + " " + tail.toString();
+			}
 		};
 	}
 	
-	public static <E> int size(FList<E> xs) {
+	public static <E> boolean contains(E elmt, FList<E> xs) {
 		if(xs.isEmpty()) {
-			return 0;
+			return false;
 		}
-		return 1 + size(xs.tail());
+		if(xs.head().equals(elmt)) {
+			return true;
+		}
+		return contains(elmt, xs.tail());
+	}
+	
+	public static <E> FList<E> concat(FList<E> xs, FList<E> ys){
+		if(xs.isEmpty()) {
+			return ys;
+		}
+		return cons(xs.head(), concat(xs.tail(), ys));
 	}
 	
 }
