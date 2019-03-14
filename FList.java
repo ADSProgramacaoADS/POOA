@@ -6,6 +6,7 @@ public abstract class FList<T> {
 	public abstract FList<T> tail();
 	public abstract boolean isEmpty();
 	public abstract boolean contains(T elmt);
+	public abstract FList<T> concat(FList<T> ys);
 	
 	public FList(int size){
 		this.size = size;
@@ -24,6 +25,9 @@ public abstract class FList<T> {
 			}
 			public boolean contains(E elmt) {
 				return false;
+			}
+			public FList<E> concat(FList<E> ys){
+				return ys;
 			}
 			public String toString() {
 				return "";
@@ -48,6 +52,9 @@ public abstract class FList<T> {
 				}
 				return tail.contains(elmt);
 			}
+			public FList<E> concat(FList<E> ys){
+				return cons(head, tail.concat(ys));
+			}
 			public String toString() {
 				return head.toString() + " " + tail.toString();
 			}
@@ -69,6 +76,22 @@ public abstract class FList<T> {
 			return ys;
 		}
 		return cons(xs.head(), concat(xs.tail(), ys));
+	}
+	
+	public static FList<Integer> build(int start, int finish){
+		if(start == finish) {
+			return empty();
+		}
+		return cons(start, build(start+1, finish));
+	}
+	
+	public static void main(String[] args) {
+		FList<Integer> xs = build(10, 20);
+		FList<Integer> ys = build(30, 40);
+		FList<Integer> zs = concat(xs, ys);
+		System.out.println(xs);
+		System.out.println(ys);
+		System.out.println(zs);
 	}
 	
 }
