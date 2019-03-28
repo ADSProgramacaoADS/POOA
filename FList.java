@@ -1,6 +1,8 @@
 package flist;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class FList<T> {
 	public final int size;
@@ -9,7 +11,10 @@ public abstract class FList<T> {
 	public abstract boolean isEmpty();
 	public abstract boolean contains(T elmt);
 	public abstract FList<T> concat(FList<T> ys);
+	public abstract FList<T> filter(Predicate<T> pred);
 	public abstract <U> FList<U> map(Function<T,U> fn);
+	public abstract <U> U foldRight(U neutro, BiFunction<T, U, U> fn);
+	public abstract <U> U foldLeft(U neutro, BiFunction <U, T, U> fn);
 	
 	public FList(int size){
 		this.size = size;
@@ -32,8 +37,17 @@ public abstract class FList<T> {
 			public FList<E> concat(FList<E> ys){
 				return ys;
 			}
+			public FList<E> filter(Predicate<E> pred) {
+				return this; 
+			}
 			public <F> FList<F> map(Function <E, F> fn){
 				return empty();
+			}
+			public <F> F foldRight(F neutro, BiFunction<E, F, F> fn) {
+				return neutro;
+			}
+			public <F> F foldLeft(F neutro, BiFunction<F, E, F>fn){
+				return neutro;
 			}
 			public String toString() {
 				return "";
@@ -61,9 +75,29 @@ public abstract class FList<T> {
 			public FList<E> concat(FList<E> ys){
 				return cons(head, tail.concat(ys));
 			}
-			public <F> FList<F> map(Function <E, F> fn){
-				return cons(fn.apply(head), tail.map(fn));
+			public FList<E> filter(Predicate<E> pred) {
+				E val = head();
+				FList<E> rest = tail.filter(pred);
+				if (pred.test(val)){
+					return cons(val, rest);				
+				}
+				return rest;
 			}
+			public <F> FList<F> map(Function <E, F> fn){
+				FList<F> rest = tail.map(fn);
+				F val = fn.apply(head());
+				return cons(val, rest);
+			}
+			
+			public <F> F foldRight(F neutro, BiFunction<E, F, F> fn) {
+				F val = tail.foldRight(neutro, fn);
+			return fn.apply(head(), val);	
+			}
+			
+			public <F> F foldLeft(F neutro, BiFunction<F, E, F>fn) {
+				return tail.foldLeft(fn.apply(neutro, head()),fn);
+			}
+			
 			public String toString() {
 				return head.toString() + " " + tail.toString();
 			}
