@@ -9,12 +9,19 @@ public abstract class FList<T> {
 	public abstract T head();
 	public abstract FList<T> tail();
 	public abstract boolean isEmpty();
-	public abstract boolean contains(T elmt);
 	public abstract FList<T> concat(FList<T> ys);
 	public abstract FList<T> filter(Predicate<T> pred);
 	public abstract <U> FList<U> map(Function<T,U> fn);
 	public abstract <U> U foldRight(U neutro, BiFunction<T, U, U> fn);
 	public abstract <U> U foldLeft(U neutro, BiFunction <U, T, U> fn);
+	public abstract Flist<T> sort(Comparator <T> cmp);
+	public abstract FList<T> find(Predicate<T> pred);
+	protected abstract FList<T> insert(Comparator<T> cmp, T elmt);.
+	
+	public boolean contains(T elmt){
+		FList<T> list = find(x, -> elmt.equals(x));
+		return !list.isEmpty();
+	}
 	
 	public FList(int size){
 		this.size = size;
@@ -46,9 +53,14 @@ public abstract class FList<T> {
 			public <F> F foldRight(F neutro, BiFunction<E, F, F> fn) {
 				return neutro;
 			}
+			
 			public <F> F foldLeft(F neutro, BiFunction<F, E, F>fn){
 				return neutro;
 			}
+			public FList<E> find(Predicate<E> pred){return this; }
+			public FList<E> insert(Comparator <E> cmp, E elmt){ return (cons) E elmt, this;}
+			public FList<E> sort(Comparator<E> cmp) {return this;}
+			
 			public String toString() {
 				return "";
 			}
@@ -66,12 +78,7 @@ public abstract class FList<T> {
 			public boolean isEmpty() {
 				return false;
 			}
-			public boolean contains(E elmt) {
-				if(head.equals(elmt)) {
-					return true;
-				}
-				return tail.contains(elmt);
-			}
+			
 			public FList<E> concat(FList<E> ys){
 				return cons(head, tail.concat(ys));
 			}
@@ -97,6 +104,18 @@ public abstract class FList<T> {
 			public <F> F foldLeft(F neutro, BiFunction<F, E, F>fn) {
 				return tail.foldLeft(fn.apply(neutro, head()),fn);
 			}
+			
+			protected Flist<E> insert (Comparator<E> cmp, E elmt){
+				if(cmp.compare(elmt, head) <=0) return cons(elmt, this);
+				FList<E> list= tail.insert(cmp, elmt);
+				return cons(head, list);
+			}
+			public FList<E> sort(Comparator<E> cmp) {
+				return tail.sort(cmp).insert(head);
+			}
+			public FList<E> find(Predicate<E> pred){
+				if(pred.test(head)) return this;
+				return tail.find(pred);
 			
 			public String toString() {
 				return head.toString() + " " + tail.toString();
